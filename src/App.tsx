@@ -57,7 +57,7 @@ export default function App() {
     }, []);
 
     const fetchData = async (userId: string) => {
-        setLoading(true);
+        // setLoading(true); // Removed to prevent blocking UI if fetch hangs
         try {
             // Fetch Profile
             const { data: profileData } = await supabase

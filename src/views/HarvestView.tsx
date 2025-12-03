@@ -148,9 +148,15 @@ export const HarvestView = ({ prompts, memories, setMemories, setActiveTab }: { 
 
         // Upload to Supabase Storage
         const fileName = `${Date.now()}.webm`;
-        const { data: uploadData } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
             .from('memories')
             .upload(fileName, blob);
+
+        if (uploadError) {
+            alert(`Upload Error: ${uploadError.message}`);
+            console.error('Upload Error:', uploadError);
+            return;
+        }
 
         let publicUrl = '';
         if (uploadData) {
@@ -163,7 +169,7 @@ export const HarvestView = ({ prompts, memories, setMemories, setActiveTab }: { 
         const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
-            const { data: memoryData } = await supabase
+            const { data: memoryData, error: dbError } = await supabase
                 .from('memories')
                 .insert({
                     user_id: user.id,
@@ -176,6 +182,11 @@ export const HarvestView = ({ prompts, memories, setMemories, setActiveTab }: { 
                 })
                 .select()
                 .single();
+
+            if (dbError) {
+                alert(`Database Error: ${dbError.message}`);
+                console.error('Database Error:', dbError);
+            }
 
             if (memoryData) {
                 const newMemory: Memory = {
