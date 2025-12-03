@@ -29,7 +29,13 @@ export default function App() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Safety timeout to prevent infinite hanging
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 3000);
+
         supabase.auth.getSession().then(({ data: { session } }) => {
+            clearTimeout(timer);
             setSession(session);
             if (session) fetchData(session.user.id);
             else setLoading(false);
