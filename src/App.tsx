@@ -67,8 +67,15 @@ export default function App() {
                 .single();
 
             if (profileData) {
-                // Merge with default profile to ensure all fields exist (since schema might be partial)
-                setProfile({ ...DEFAULT_PROFILE, ...profileData });
+                // Merge with default profile to ensure all fields exist
+                setProfile({
+                    ...DEFAULT_PROFILE,
+                    ...profileData,
+                    // Ensure arrays exist even if DB returns null
+                    priorities: profileData.priorities || DEFAULT_PROFILE.priorities,
+                    likes: profileData.likes || DEFAULT_PROFILE.likes,
+                    dislikes: profileData.dislikes || DEFAULT_PROFILE.dislikes
+                });
                 setOnboardingComplete(true);
             } else {
                 // New user, no profile yet
