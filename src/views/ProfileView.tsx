@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, Link as LinkIcon, Anchor as AnchorIcon, Heart, AlertTriangle, Plus } from 'lucide-react';
 import { Profile, Prompt } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const ProfileView = ({ profile, setProfile, prompts, setPrompts, setActiveTab }: { profile: Profile, setProfile: (p: Profile) => void, prompts: Prompt[], setPrompts: (p: Prompt[]) => void, setActiveTab: (t: any) => void }) => {
     const [editMode, setEditMode] = useState(false);
@@ -8,7 +9,15 @@ export const ProfileView = ({ profile, setProfile, prompts, setPrompts, setActiv
     const [newPromptText, setNewPromptText] = useState('');
     const [newPromptCategory, setNewPromptCategory] = useState<'peak' | 'crisis'>('peak');
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            await supabase.from('profiles').update({
+                priorities: tempProfile.priorities,
+                likes: tempProfile.likes,
+                dislikes: tempProfile.dislikes
+            }).eq('id', user.id);
+        }
         setProfile(tempProfile);
         setEditMode(false);
     };
